@@ -1,4 +1,4 @@
-function solveMicroLayer
+function solveMicroLayer_odefun
 
 close all
 
