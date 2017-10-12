@@ -71,9 +71,30 @@ close all
 
 %% Parameters for micro and macro region
 
+% % Fluid - Vapor parameters
+sig    = 0.059;       % Suface tension
+g      = 9.8;         % Acceleration due to gravity
+rho_l  = 958.4;       % Density of liquid
+rho_g  = 0.59;        % Density of vapor
+mu_l   = 280.0e-6;    % Viscosity of liquid
+mu_g   = 12.6e-6;     % Viscosity of vapor
+cp_l   = 4216.0;      % Specific heat of liquid
+cp_g   = 2030.0;      % Specific heat of vapor
+k_l    = 0.679;       % Thermal conducitivity of liquid
+k_g    = 0.025;       % Thermal conducitivity of vapor
+h_gl   = 2260.0e3;    % Latent heat of vaporization
+Ts     = 373.12;      % Saturation temperature
+Tb     = 373.12;      % Bulk liquid temperature
+Tw     = 379.3120;    % Wall temperature
+A      = 8.5e-21;     % Hamakar constant
+Rg     = 461.5;       % Gas constant for water in (J/KgK)
+
+[lo,to,uo,rho_d,mu_d,cp_d,k_d,alpha_d,Re,Pr,Pe,St,Fr,We,Tsat,Tbulk,Twall,Abar,Bbar,Cbar] = getScalingNumbers(sig,g,rho_l,rho_g,mu_l,mu_g,cp_l,cp_g,k_l,k_g,h_gl,Ts,Tb,Tw,A,Rg);
+
+rho = 1/rho_d;        % rho = rho_g/rho_l
+
 % % Macro region
 lx  = 1;              % Length of Domain - Dimensionless 
-lo  = 0.0025;         % Reference length Scale - m
 nx  = 100;            % Number of points on macro-scale
 dx  = lx/nx;          % dx = dy on macro scale
 
@@ -83,22 +104,6 @@ b   = 0.3*dx;         % Arbitary contact line for a macro cell
 psi = 38*(pi/180);    % Contact angle
 R   = h/tan(psi);     % Film radius - upper limit
 R0  = 0;              % Film radius - lower limit
-
-
-% % Dimensionless Parameters
-
-Re    = 1345.1;       % Reynolds number
-Pr    = 1.7386;       % Prandtl number
-St    = 0.0116;       % Stefan (Jakob) number
-rho   = 1/1624.4;     % Density ratio (rho_v/rho_l)
-Pe    = Re*Pr;        % Peclet number
-We    = 1.0006;       % Weber number
-Abar  = 3.0812e-11;   % Dimensionless Hamakar constant
-Bbar  = 6.5426e-07;   % Dimensionless number #1
-Cbar  = 1.0736e-08;   % Dimensionless number #2 
-Twall = 1.0;          % Dimensionless wall temperature
-Tsat  = 0.0;          % Dimensinaless satruation temperature
-
 
 %% Solution
 
