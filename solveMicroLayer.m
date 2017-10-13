@@ -21,7 +21,7 @@ close all
 % z2 = Local slope of the interface
 % z3 = Pc = Pl - Pv = capillary pressure
 % z4 = Mass flow rate
-% K = theta''/[1+(theta')^2]^3/2
+% K  = Interface curvature = theta''/[1+(theta')^2]^3/2
 
 % dz1/dr = z2;
 % dz2/dr = {[z3 - Abar/(theta^3)]/(Re/We)}*(1+z2^2)^3/2
@@ -29,7 +29,7 @@ close all
 % dz4/dr = [Tsat - Twall + (Bbar/Re)*z3]/[z1 + Cbar/rho]
 
 % Where,
-% dz4/dr = Heat flux
+% dz4/dr = Evaporative heat flux
 
 % % % Boundary conditions
 
