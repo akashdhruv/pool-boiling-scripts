@@ -1,0 +1,9 @@
+function[dzdr] = getFun(z,Re,Pe,We,St,Abar,Bbar,Cbar,rho,Tsat,Twall)
+
+dzdr = [z(2),...
+        ((z(3)-Abar/(z(1)^3))/(Re/We))*((1+z(2)^2)^(3/2)),...
+        3*z(4)/(z(1)^3),...
+        (St/Pe)*(Tsat - Twall + (Bbar/Re)*z(3))/(z(1) + (Cbar/rho))];
+           
+
+end

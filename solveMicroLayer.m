@@ -1,3 +1,4 @@
+clc
 clear
 close all
 
@@ -72,44 +73,82 @@ close all
 %% Parameters for micro and macro region
 
 % % Fluid - Vapor parameters
-sig    = 0.059;       % Suface tension
-g      = 9.8;         % Acceleration due to gravity
-rho_l  = 958.4;       % Density of liquid
-rho_g  = 0.59;        % Density of vapor
-mu_l   = 280.0e-6;    % Viscosity of liquid
-mu_g   = 12.6e-6;     % Viscosity of vapor
-cp_l   = 4216.0;      % Specific heat of liquid
-cp_g   = 2030.0;      % Specific heat of vapor
-k_l    = 0.679;       % Thermal conducitivity of liquid
-k_g    = 0.025;       % Thermal conducitivity of vapor
-h_gl   = 2260.0e3;    % Latent heat of vaporization
-Ts     = 373.12;      % Saturation temperature
-Tb     = 373.12;      % Bulk liquid temperature
-Tw     = 379.3120;    % Wall temperature
-A      = 8.5e-21;     % Hamakar constant
-Rg     = 461.5;       % Gas constant for water in (J/KgK)
+% sig    = 0.059;       % Suface tension
+% g      = 9.8;         % Acceleration due to gravity
+% rho_l  = 958.4;       % Density of liquid
+% rho_g  = 0.59;        % Density of vapor
+% mu_l   = 280.0e-6;    % Viscosity of liquid
+% mu_g   = 12.6e-6;     % Viscosity of vapor
+% cp_l   = 4216.0;      % Specific heat of liquid
+% cp_g   = 2030.0;      % Specific heat of vapor
+% k_l    = 0.679;       % Thermal conducitivity of liquid
+% k_g    = 0.025;       % Thermal conducitivity of vapor
+% h_gl   = 2260.0e3;    % Latent heat of vaporization
+% Ts     = 373.12;      % Saturation temperature
+% Tb     = 373.12;      % Bulk liquid temperature
+% Tw     = 379.3120;    % Wall temperature
+% A      = 8.5e-21;     % Hamakar constant
+% Rg     = 461.5;       % Gas constant for water in (J/KgK)
+
+sig   = 0.014707;
+g     = 9.8;
+rho_l = 1508.4;
+rho_g = 7.4048;
+mu_l  = (3.25e-7)*rho_l;
+mu_g  = (1.39e-6)*rho_g;
+cp_l  = 940.28;
+cp_g  = 691.30;
+k_l   = 0.063671;
+k_g   = 0.0095023;
+h_gl  = 144350;
+Ts    = 47 + 273;
+Tb    = 47 + 273;
+Tw    = 72 + 273;
+A     = 1.0e-20;
+Rg    = 8.314/0.187376;
+
+
+% sig    = 8.4e-3;
+% g      = 9.8;
+% rho_l  = 1621.2;
+% rho_g  = 13.491; 
+% mu_l   = 4.13e-4;
+% mu_g   = 1.19e-5;
+% cp_l   = 1106.7;
+% cp_g   = 924.81;
+% k_l    = 5.4165e-2;
+% k_g    = 1.3778e-2;
+% h_gl   = 83562;
+% Tb     = 50 + 273;
+% Tw     = 90 + 273;
+% Ts     = 56 + 273;
+% Rg = 8.314/0.33804;
+% A = 1e-20;
 
 [lo,to,uo,rho_d,mu_d,cp_d,k_d,alpha_d,Re,Pr,Pe,St,Fr,We,Tsat,Tbulk,Twall,Abar,Bbar,Cbar] = getScalingNumbers(sig,g,rho_l,rho_g,mu_l,mu_g,cp_l,cp_g,k_l,k_g,h_gl,Ts,Tb,Tw,A,Rg);
 
 rho = 1/rho_d;        % rho = rho_g/rho_l
 
 % % Macro region
-lx  = 1;              % Length of Domain - Dimensionless 
-nx  = 100;            % Number of points on macro-scale
+lx  = 2;              % Length of Domain - Dimensionless 
+nx  = 40; %100;       % Number of points on macro-scale
 dx  = lx/nx;          % dx = dy on macro scale
 
 % % Micro region
 h   = dx/2;           % Maximum film thickness for micro scale
-b   = 0.3*dx;         % Arbitary contact line for a macro cell
-psi = 38*(pi/180);    % Contact angle
+b   = 0.3*dx;         % Arbitrary contact line for a macro cell
+psi = 50*(pi/180);    % Contact angle
 R   = h/tan(psi);     % Film radius - upper limit
 R0  = 0;              % Film radius - lower limit
 
 %% Solution
 
-% % Integration steps
-N      = 5000;
-step   = R/N;
+% Integration steps
+% N      = 2000;
+% step   = R/N;
+
+step   = 0.2d-4;
+N      = floor(R/step);
 
 % % Arrays
 z1     = zeros(N,1);  % z1
@@ -127,26 +166,37 @@ z1(1) = h;
 z2(1) = tan(psi);
 z3(1) = Abar/(h^3);
 z4(1) = 0.0;
-step  = -step;        % change direction for time stepping
-R     = R+R0;         % swap upper and lower limits
-R0    = R-R0;         % swap upper and lower limits
-R     = R-R0;         % swap upper and lower limits
 
-% % Initial conditions at lower boundary
+% x     = (R-R0).*(1-cos(linspace(pi/2,0,N)));
+x = linspace(R,R0,N);
 
-% z1(1) = ((Abar*Bbar)/(Re*(Twall-Tsat)))^(1/3);
-% z2(1) = 0.0;
-% z3(1) = ((Twall-Tsat)*Re)/Bbar;
-% z4(1) = 0.0;
+z     = zeros(1,4);
 
 % % Solve using 1st order Euler method
 
 for i = 2:N
-     
-    z1(i) = z1(i-1) + step*z2(i-1);
-    z2(i) = z2(i-1) + step*((z3(i-1)-Abar/(z1(i-1)^3))/(Re/We))*((1+z2(i-1)^2)^(3/2));
-    z3(i) = z3(i-1) + step*(3*St/Pe)*(z4(i-1)/(z1(i-1)^3));
-    z4(i) = z4(i-1) + step*(Tsat - Twall + (Bbar/Re)*z3(i-1))/(z1(i-1) + (Cbar/rho));
+    
+    step = x(i)-x(i-1);
+    
+    % Euler explicit
+    z = [z1(i-1),z2(i-1),z3(i-1),z4(i-1)];
+    a = step*getFun(z,Re,Pe,We,St,Abar,Bbar,Cbar,rho,Tsat,Twall);
+    
+    z = z + a;
+    
+%     % RK - 4
+%     z = [z1(i-1),z2(i-1),z3(i-1),z4(i-1)];
+%     a = step*getFun(z,Re,Pe,We,St,Abar,Bbar,Cbar,rho,Tsat,Twall);
+%     b = step*getFun(z+a./2,Re,Pe,We,St,Abar,Bbar,Cbar,rho,Tsat,Twall);
+%     c = step*getFun(z+b./2,Re,Pe,We,St,Abar,Bbar,Cbar,rho,Tsat,Twall);
+%     d = step*getFun(z+c,Re,Pe,We,St,Abar,Bbar,Cbar,rho,Tsat,Twall);
+%     
+%     z = z + (a + 2.*b + 2.*c + d)./6;
+    
+    z1(i) = z(1);
+    z2(i) = z(2);
+    z3(i) = z(3);
+    z4(i) = z(4);
 
 end
 
@@ -162,18 +212,19 @@ for i=1:N
     
 end
 
-x = linspace(R0,R,N);
-
-qflux = sum(abs(step).*q);
+St
+qflux = sum(abs(step).*q)*dx
+fflux = sum(step.*K)*dx
+Tsat
 
 % % Plots
 
 % Curvature
 figure
-plot(x,-z3,'-b')
+plot(x,-K,'-b')
 xlim([min(R0,R) max(R0,R)])
 xlabel('r/lo')
-ylabel('Pc')
+ylabel('K')
 
 % Film thickness
 figure
@@ -195,4 +246,5 @@ plot(x,T_int,'-k')
 xlim([min(R0,R) max(R0,R)])
 xlabel('r/lo')
 ylabel('\Theta')
+
 
