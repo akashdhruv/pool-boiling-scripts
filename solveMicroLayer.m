@@ -73,39 +73,39 @@ close all
 %% Parameters for micro and macro region
 
 % % Fluid - Vapor parameters
-% sig    = 0.059;       % Suface tension
-% g      = 9.8;         % Acceleration due to gravity
-% rho_l  = 958.4;       % Density of liquid
-% rho_g  = 0.59;        % Density of vapor
-% mu_l   = 280.0e-6;    % Viscosity of liquid
-% mu_g   = 12.6e-6;     % Viscosity of vapor
-% cp_l   = 4216.0;      % Specific heat of liquid
-% cp_g   = 2030.0;      % Specific heat of vapor
-% k_l    = 0.679;       % Thermal conducitivity of liquid
-% k_g    = 0.025;       % Thermal conducitivity of vapor
-% h_gl   = 2260.0e3;    % Latent heat of vaporization
-% Ts     = 373.12;      % Saturation temperature
-% Tb     = 373.12;      % Bulk liquid temperature
-% Tw     = 379.3120;    % Wall temperature
-% A      = 8.5e-21;     % Hamakar constant
-% Rg     = 461.5;       % Gas constant for water in (J/KgK)
+sig    = 0.059;       % Suface tension
+g      = 9.8;         % Acceleration due to gravity
+rho_l  = 958.4;       % Density of liquid
+rho_g  = 0.59;        % Density of vapor
+mu_l   = 280.0e-6;    % Viscosity of liquid
+mu_g   = 12.6e-6;     % Viscosity of vapor
+cp_l   = 4216.0;      % Specific heat of liquid
+cp_g   = 2030.0;      % Specific heat of vapor
+k_l    = 0.679;       % Thermal conducitivity of liquid
+k_g    = 0.025;       % Thermal conducitivity of vapor
+h_gl   = 2260.0e3;    % Latent heat of vaporization
+Ts     = 373.12;      % Saturation temperature
+Tb     = 373.12;      % Bulk liquid temperature
+Tw     = 379.3120;    % Wall temperature
+A      = 8.5e-21;     % Hamakar constant
+Rg     = 461.5;       % Gas constant for water in (J/KgK)
 
-sig   = 0.014707;
-g     = 9.8;
-rho_l = 1508.4;
-rho_g = 7.4048;
-mu_l  = (3.25e-7)*rho_l;
-mu_g  = (1.39e-6)*rho_g;
-cp_l  = 940.28;
-cp_g  = 691.30;
-k_l   = 0.063671;
-k_g   = 0.0095023;
-h_gl  = 144350;
-Ts    = 47 + 273;
-Tb    = 47 + 273;
-Tw    = 72 + 273;
-A     = 1.0e-20;
-Rg    = 8.314/0.187376;
+% sig   = 0.014707;
+% g     = 9.8;
+% rho_l = 1508.4;
+% rho_g = 7.4048;
+% mu_l  = (3.25e-7)*rho_l;
+% mu_g  = (1.39e-6)*rho_g;
+% cp_l  = 940.28;
+% cp_g  = 691.30;
+% k_l   = 0.063671;
+% k_g   = 0.0095023;
+% h_gl  = 144350;
+% Ts    = 47 + 273;
+% Tb    = 47 + 273;
+% Tw    = 72 + 273;
+% A     = 1.0e-20;
+% Rg    = 8.314/0.187376;
 
 
 % sig    = 8.4e-3;
@@ -137,7 +137,7 @@ dx  = lx/nx;          % dx = dy on macro scale
 % % Micro region
 h   = dx/2;           % Maximum film thickness for micro scale
 b   = 0.3*dx;         % Arbitrary contact line for a macro cell
-psi = 50*(pi/180);    % Contact angle
+psi = 38*(pi/180);    % Contact angle
 R   = h/tan(psi);     % Film radius - upper limit
 R0  = 0;              % Film radius - lower limit
 
@@ -147,7 +147,7 @@ R0  = 0;              % Film radius - lower limit
 % N      = 2000;
 % step   = R/N;
 
-step   = 0.2d-4;
+step   = 0.1d-5;
 N      = floor(R/step);
 
 % % Arrays
@@ -213,8 +213,9 @@ for i=1:N
 end
 
 St
-qflux = sum(abs(step).*q)*dx
-fflux = sum(step.*K)*dx
+qflux  = sum(abs(step).*q)*dx
+qflux2 = sum(abs(step).*(q.*x'))
+fflux  = sum(step.*K)*dx
 Tsat
 
 % % Plots
