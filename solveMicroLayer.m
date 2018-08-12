@@ -72,7 +72,7 @@ close all
 
 %% Parameters for micro and macro region
 
-% % Fluid - Vapor parameters
+% Fluid - Vapor parameters
 sig    = 0.059;       % Suface tension
 g      = 9.8;         % Acceleration due to gravity
 rho_l  = 958.4;       % Density of liquid
@@ -125,29 +125,48 @@ Rg     = 461.5;       % Gas constant for water in (J/KgK)
 % Rg = 8.314/0.33804;
 % A = 1e-20;
 
+% sig    = 8.4e-3;
+% g      = 9.8;
+% rho_l  = 1636;
+% rho_g  = 9.92;
+% mu_l   = 4.96e-4;
+% mu_g   = 1.00e-4;
+% cp_l   = 1084.0;
+% cp_g   = 900.0;
+% k_l    = 5.32e-2;
+% k_g    = 1.3e-2;
+% h_gl   = 87096.5;
+% Tb     = 43.5 + 273;
+% Tw     = 57 + 273;
+% Ts     = 43.5 + 273;
+% Rg     = 8.314/0.33804;
+% A      = 1.0e-20;
+
+
 [lo,to,uo,rho_d,mu_d,cp_d,k_d,alpha_d,Re,Pr,Pe,St,Fr,We,Tsat,Tbulk,Twall,Abar,Bbar,Cbar] = getScalingNumbers(sig,g,rho_l,rho_g,mu_l,mu_g,cp_l,cp_g,k_l,k_g,h_gl,Ts,Tb,Tw,A,Rg);
 
 rho = 1/rho_d;        % rho = rho_g/rho_l
 
 % % Macro region
-lx  = 2;              % Length of Domain - Dimensionless 
-nx  = 40; %100;       % Number of points on macro-scale
+lx  = 50;              % Length of Domain - Dimensionless 
+nx  = 160; %100;       % Number of points on macro-scale
 dx  = lx/nx;          % dx = dy on macro scale
 
 % % Micro region
-h   = dx/2;           % Maximum film thickness for micro scale
 b   = 0.3*dx;         % Arbitrary contact line for a macro cell
-psi = 38*(pi/180);    % Contact angle
+psi = 45*(pi/180);  % Contact angle
+h   = dx/2;           % Maximum film thickness for micro scale
 R   = h/tan(psi);     % Film radius - upper limit
 R0  = 0;              % Film radius - lower limit
+rnuc = 10;
 
 %% Solution
 
 % Integration steps
-% N      = 2000;
+% N      = 5000;
 % step   = R/N;
 
-step   = 0.1d-5;
+step   = 2e-5;
 N      = floor(R/step);
 
 % % Arrays
@@ -174,9 +193,11 @@ z     = zeros(1,4);
 
 % % Solve using 1st order Euler method
 
+step = -step;
+
 for i = 2:N
     
-    step = x(i)-x(i-1);
+    %step = x(i)-x(i-1);
     
     % Euler explicit
     z = [z1(i-1),z2(i-1),z3(i-1),z4(i-1)];
@@ -212,11 +233,15 @@ for i=1:N
     
 end
 
-St
-qflux  = sum(abs(step).*q)*dx
-qflux2 = sum(abs(step).*(q.*x'))
-fflux  = sum(step.*K)*dx
-Tsat
+% St
+qflux  = -sum(abs(step).*q)*dx
+% qflux2 = sum(step.*(q.*x'))
+% qflux2 = sum(step.*(q))
+% fflux  = sum(step.*K)*dx
+% Tsat
+
+qflux = sum(step.*(q.*(rnuc+x)'))
+qflux = qflux/(0.75*dx*dx)
 
 % % Plots
 
